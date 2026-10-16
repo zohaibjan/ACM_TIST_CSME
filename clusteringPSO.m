@@ -1,6 +1,5 @@
-function obj=classifierSelectionPSO(trainData, validationData, params)
-     warning('off','all');
-   
+function obj=clusteringPSO(trainData, validationData, params)
+
     %set optimization function to PSOAF
     fun = @PSOAF;
 

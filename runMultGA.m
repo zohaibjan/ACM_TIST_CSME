@@ -1,5 +1,5 @@
 function obj = runMultGA(classifierList, testData)
-    warning('off','all');
+
     allPredictions = psoPredict(classifierList, testData);
     
     %set optimization function to PSOAF

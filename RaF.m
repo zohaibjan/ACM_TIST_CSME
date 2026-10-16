@@ -15,7 +15,7 @@ else
 end
 for m=1:length(learners)
     for i=1:length(Problem)
-        warning('off','all');
+
         p_name = Problem{i};
         %% Create CROSS VALIDATION FOLDS
         numOfFolds = 10;
@@ -75,7 +75,7 @@ for m=1:length(learners)
             eval = Evaluate(testY, predictY);
             avgAccuracy(fold) = eval(1);
         end
-        if (exist([pwd filesep 'results-RaF.csv'], 'file') == 0)
+        if (exist([pwd filesep 'results-Raf.csv'], 'file') == 0)
             fid = fopen([pwd filesep 'results-Raf.csv'], 'w');
             fprintf(fid, '%s,%s,%s\n', ...
                 'Data Set', 'Method','Accuracy' ...
@@ -85,7 +85,7 @@ for m=1:length(learners)
         end
         fprintf(fid, '%s,', p_name);
         fprintf(fid, '%s,', learners{m});
-        fprintf(fid, '%f±%f\n',mean(avgAccuracy),std(avgAccuracy));
+        fprintf(fid, '%fÂ±%f\n',mean(avgAccuracy),std(avgAccuracy));
         fclose(fid);
     end
 end

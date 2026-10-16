@@ -1,5 +1,4 @@
 function rstx = runTraining(p_name , params)
-warning('off','all');
 
 %% Create CROSS VALIDATION FOLDS
 numOfFolds = params.numOfFolds;
@@ -53,11 +52,8 @@ for fold=1:numOfFolds
             % TRY WITH 10/25/58/75 test samples
             all = trainClassifiers(trainCluster, params);
             for temp = 1:length(all)
-                all = trainClassifiers(trainCluster, params);
-                for temp = 1:length(all)
-                    classifiers{classifierIndex} = all{1,temp};
-                    classifierIndex = classifierIndex + 1;
-                end
+                classifiers{classifierIndex} = all{1,temp};
+                classifierIndex = classifierIndex + 1;
             end
             
         end

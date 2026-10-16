@@ -25,7 +25,6 @@ params.trainFunctionDiscriminant = {'pseudoLinear','pseudoQuadratic'};
 params.kernelFunctionSVM={'gaussian','polynomial','linear'};
 numRun = 3;
 
-warning('off','all');
 for p = 1:length(Problem)
     p_name = Problem{p};
     %% Create CROSS VALIDATION FOLDS

@@ -1,6 +1,5 @@
 function obj=optimizedFeatures(trainData, validationData, params)
-    warning('off','all');
-    
+
     trainX = trainData(:,1:end-1);
     trainY = trainData(:, end);
     

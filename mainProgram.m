@@ -1,4 +1,4 @@
-function program = mainProgram()
+function mainProgram()
 clear all;
 clc;
 
@@ -21,7 +21,7 @@ params.trainFunctionDiscriminant = {'pseudoLinear','pseudoQuadratic'};
 params.kernelFunctionSVM={'gaussian','polynomial','linear'};
 
 %% MAIN LOOP
-parfor i=1:length(Problem)
+for i=1:length(Problem)
     for j =1:1
         p_name = Problem{i};
         disp(p_name);

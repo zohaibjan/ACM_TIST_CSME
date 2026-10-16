@@ -1,7 +1,6 @@
 function obj=classifierSelectionPSO(classifierList, testData, p_name)
-warning('off','all');
+
 try
-    warning('off','all');
 
         allPredictions = psoPredict(classifierList, testData);
 
