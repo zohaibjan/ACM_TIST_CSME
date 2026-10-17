@@ -19,6 +19,10 @@
 
 function [gBest,gBestScore,ConvergenceCurve]=BPSO(noP,Max_iteration,BPSO_num,CostFunction,noV, classifierList, testData)
 
+validateattributes(noP,{'numeric'},{'scalar','integer','positive'});
+validateattributes(Max_iteration,{'numeric'},{'scalar','integer','positive'});
+validateattributes(noV,{'numeric'},{'scalar','integer','positive'});
+validateattributes(BPSO_num,{'numeric'},{'scalar','integer','>=',1,'<=',8});
 %Initial Parameters for PSO
 w=2;              %Inirtia weight
 wMax=0.9;         %Max inirtia weight
@@ -31,7 +35,7 @@ Velocity=zeros(noP,noV);%Velocity vector
 Position=zeros(noP,noV);%Position vector
 
 %////////Cognitive component///////// 
-pBestScore=zeros(noP);
+pBestScore=inf(noP,1);
 pBest=zeros(noP,noV);
 %////////////////////////////////////
 
@@ -61,6 +65,7 @@ for l=1:Max_iteration
     %Calculate cost for each particle
     for i=1:size(Position,1)  
         fitness=CostFunction(Position(i,:),classifierList, testData);
+        validateattributes(fitness,{'numeric'},{'scalar','real','finite'});
         
         if(pBestScore(i)>fitness)
             pBestScore(i)=fitness;

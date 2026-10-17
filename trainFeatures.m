@@ -1,6 +1,6 @@
 %%collects classifiers and stores them in an array. 
 function [classifiers] = trainFeatures(X, y, params)
-        maxTreeSize = round(length(X)*0.1);
+        maxTreeSize = max(1, round(size(X,1)*0.1));
         %% randomize parameters
         def.range=[4 6;             % hidden neuron NN
                    1 9;             % training function NN
@@ -16,7 +16,14 @@ function [classifiers] = trainFeatures(X, y, params)
         %% Templates for CLassifiers
         t = templateTree('minleafsize', p(7));
         knn = templateKNN('NumNeighbors', 10,'Standardize',1);
-        svm=templateSVM('KernelFunction',params.KernelFunction{1},'IterationLimit',p(9),'Standardize',1);
+        kernel = 'linear';
+        if isfield(params,'KernelFunction')
+            kernel = params.KernelFunction;
+        elseif isfield(params,'kernelFunctionSVM')
+            kernel = params.kernelFunctionSVM;
+        end
+        if iscell(kernel), kernel = kernel{1}; end
+        svm=templateSVM('KernelFunction',kernel,'IterationLimit',p(9),'Standardize',1);
        
         classifiers = {};
         index = 1;
@@ -109,7 +116,7 @@ function [classifiers] = trainFeatures(X, y, params)
                 end
             end
         catch exc
-            disp(sprintf('something happened in training %s \n', exc.identifier));
+            rethrow(exc);
         end
         
 end

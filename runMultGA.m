@@ -1,37 +1,36 @@
-function obj = runMultGA(classifierList, testData)
-
-    allPredictions = psoPredict(classifierList, testData);
-    
-    %set optimization function to PSOAF
-    fun = @MULTGA;
-        
-    %lower and upper bounds. FOR BINARY
-    lb=zeros(1,length(classifierList));
-    ub=ones(1,length(classifierList));
-    
-    options = optimoptions('gamultiobj','populationtype','bitstring');
-%     options.populationtype = 'bitstring';
-    
-    [best,fval,exitflag,output] = gamultiobj(fun, length(classifierList),[],[],[],[],[],[], options);
-
-    %set returned objects.
-    obj.chromosome=round(best);
-    obj.chromosome = obj.chromosome(find(sum(obj.chromosome,2) == min(sum(obj.chromosome,2))),:)
-    obj.fval=fval;
-    obj.output=output;
-
-    %% OBJECTIVE FUNCTION
-    function error=MULTGA(clsf)
-        c = round(clsf);
-        c = find(c);
-        %% **************************** %%
-        decisionMatrix = ones(length(testData(:,end)), length(c));
-        for i=1:length(c)            
-            decisionMatrix(:,i) = allPredictions(:, c(i)) ;
+function obj = runMultGA(classifierList, validationData, solverOptions)
+%RUNMULTGA Pareto search for mean double fault and validation voting error.
+% A singleton's double fault is its error rate. Empty masks retain model one.
+% Select the smallest Pareto ensemble, then lowest error/double fault/index.
+predictions = psoPredict(classifierList, validationData);
+n = size(predictions,2);
+if nargin < 3 || isempty(solverOptions)
+    solverOptions = optimoptions('gamultiobj', 'PopulationType', 'bitstring', 'Display', 'off');
+end
+[best, scores, exitflag, output] = gamultiobj(@objective, n, [], [], [], [], ...
+    zeros(1,n), ones(1,n), solverOptions);
+masks = false(size(best));
+for k = 1:size(best,1)
+    masks(k,:) = selectionMask(best(k,:),0.5);
+end
+[~, order] = sortrows([sum(masks,2), scores(:,2), scores(:,1), (1:size(best,1)).']);
+chosen = order(1);
+obj.chromosome = double(masks(chosen,:));
+obj.fval = scores(chosen,:);
+obj.paretoChromosomes = double(masks);
+obj.paretoScores = scores;
+obj.exitflag = exitflag;
+obj.output = output;
+    function value = objective(weights)
+        mask = selectionMask(weights,0.5);
+        selected = predictions(:,mask);
+        wrong = selected ~= validationData(:,end);
+        if size(selected,2) == 1
+            doubleFault = mean(wrong);
+        else
+            pairs = nchoosek(1:size(selected,2),2);
+            doubleFault = mean(mean(wrong(:,pairs(:,1)) & wrong(:,pairs(:,2)),1));
         end
-        error(1)= Double_Fault(allPredictions,testData);
-        decisionMatrix = mode(decisionMatrix, 2);
-        error(2) = mean(decisionMatrix ~= testData(:,end));
+        value = [doubleFault, mean(votePredictions(selected) ~= validationData(:,end))];
     end
 end
-

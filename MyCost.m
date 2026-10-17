@@ -17,17 +17,9 @@
 %                                                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [o] = MyCost(c, classifierList, testData)
-    
-    allPredictions = psoPredict(classifierList, testData);
-    c = find(c);
-    decisionMatrix = ones(length(testData(:,end)), length(c));
-    for i=1:length(c)            
-        decisionMatrix(:,i) = allPredictions(:, c(i)) ;
-    end
-    decisionMatrix = mode(decisionMatrix, 2);
-    error = mean(decisionMatrix ~= testData(:,end));
-    
-    o=error; % Modify or replace here according to your cost funciton
+function o = MyCost(weights, classifierList, validationData)
+%MYCOST A finite error for the same nonempty mask used by the GA/PSO helpers.
+predictions = psoPredict(classifierList, validationData);
+mask = selectionMask(weights,0.5);
+o = mean(votePredictions(predictions(:,mask)) ~= validationData(:,end));
 end
-

@@ -1,43 +1,30 @@
-function obj=optimizedFeatures(trainData, validationData, params)
-
-    trainX = trainData(:,1:end-1);
-    trainY = trainData(:, end);
-    
-    valX = validationData(:,1:end-1);
-    valY = validationData(:, end);
-    
-    %set optimization function to PSOAF
-    fun = @PSOAF;
-
-    %lower and upper bounds. FOR BINARY
-    lb=zeros(1,size(trainX,2));
-    ub=ones(1,size(trainX,2));
-    
-    options = optimoptions('particleswarm','SwarmSize',min(100,size(trainX,2)));    
-  
-    %iterations.
-    options.MaxIter=100;
-    options.StallIterLimit=5;
-    
-    [best,fval,exitflag,output]=particleswarm(fun,size(trainX,2),lb,ub, options);
-
-    %set returned objects.
-    obj.chromosome=round(best); %best features
-    obj.fval=fval;
-    obj.output=output;
-    
-    %% OBJECTIVE FUNCTION
-    function error=PSOAF(features)
-        columns = round(features);
-        columns = find(columns);
-        classifierIndex = 1;
-        classifiers = {};
-        all = trainFeatures(trainX(:,columns), trainY, params);
-        for temp = 1:length(all)
-            classifiers{classifierIndex} = all{1,temp};
-            classifierIndex = classifierIndex + 1;
-        end
-        [~, accuracy] = featureFusion(classifiers, valX(:,columns), valY);
-        error = 1-accuracy;
+function obj = optimizedFeatures(trainData, validationData, params, solverOptions)
+%OPTIMIZEDFEATURES Train on training rows; score a nonempty feature mask on validation.
+trainX = trainData(:,1:end-1);
+trainY = trainData(:,end);
+valX = validationData(:,1:end-1);
+valY = validationData(:,end);
+n = size(trainX,2);
+if n < 1 || size(valX,2) ~= n
+    error('Research:InvalidFeatures', 'Training and validation feature counts must agree.');
+end
+if nargin < 4 || isempty(solverOptions)
+    solverOptions = optimoptions('particleswarm', 'SwarmSize', min(100,max(2,n)), ...
+        'MaxIterations',100, 'MaxStallIterations',5, 'Display','off');
+end
+[best, score, exitflag, output] = particleswarm(@objective,n,zeros(1,n),ones(1,n),solverOptions);
+obj.chromosome = double(selectionMask(best,0.5));
+obj.fval = score;
+obj.exitflag = exitflag;
+obj.output = output;
+    function value = objective(weights)
+        mask = selectionMask(weights,0.5);
+        % Keep stochastic learner initialisation reproducible across evaluations.
+        state = rng;
+        restore = onCleanup(@() rng(state));
+        rng(1,'twister');
+        classifiers = trainFeatures(trainX(:,mask),trainY,params);
+        [~, accuracy] = featureFusion(classifiers,valX(:,mask),valY);
+        value = 1-accuracy;
     end
 end
