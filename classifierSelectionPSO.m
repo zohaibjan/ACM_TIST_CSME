@@ -1,4 +1,11 @@
-function obj=classifierSelectionPSO(classifierList, testData, p_name)
+function obj=classifierSelectionPSO(classifierList, testData, p_name, solverOptions)
+
+if nargin < 3
+    p_name = 'dataset';
+end
+if nargin < 4
+    solverOptions = [];
+end
 
 try
 
@@ -11,6 +18,9 @@ try
         options2.MaxIterations=200;
         options2.MaxStallIterations=20;
 
+    if ~isempty(solverOptions)
+        options2 = solverOptions;
+    end
         lb=zeros(1,length(classifierList));
         ub=ones(1,length(classifierList));
         [best,fval,exitflag,output]=particleswarm(fun, length(classifierList),lb,ub,options2);
