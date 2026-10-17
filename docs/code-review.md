@@ -15,11 +15,19 @@ assertSuccess(results);
 
 The test fixtures are synthetic. `FixedClassifier`, where supplied, implements `predict` without fitting a model and is on the path only for the test session. Majority ties choose the smallest numeric label. Empty or invalid votes fail explicitly. ANN vocabularies are learned from training labels, not held-out labels. PSO thresholds retain the repository's setting, with one shared nonempty mask policy for objective scoring and final return. Random selection, where used, has at most pool-size times elimination-budget attempts.
 
-## Still requires target-runtime validation
+## Executed MATLAB validation
 
-- MATLAB/toolbox compatibility and neural-network training/prediction APIs.
+Actual SVM/tree and ANN training, particleswarm, ga, gamultiobj, all eight binary PSO variants, feature selection with fitted decision trees, and core utility regressions.
+
+GA uses the same >0.5 nonempty mask during scoring and return. Multi-objective GA measures pairwise double fault on selected models, returns one score-aligned ensemble, and exposes all Pareto masks/scores separately. BPSO personal-best storage is a vector. Feature PSO uses supported option names, nonempty masks and reproducible learner initialization. Prediction/training failures propagate instead of manufacturing votes. Original third-party author notices remain.
+
+See [validation.md](validation.md) for the exact run, release and boundaries.
+
+## Remaining validation
+
+- Compatibility beyond the tested MATLAB R2024b/toolbox release.
 - Full training runs with the documented datasets, preserving training/validation/test separation.
 - Numerical quality, random seeds, paper-method agreement, runtime and memory consumption.
 - Optional historical optimizer/diversity/alternate-driver files are not a validated library.
 
-The review environment has no MATLAB installation. Static lint passed, but the MATLAB unit tests were not run. No reproduced accuracy or benchmark claim is made.
+The regression/smoke suite passed in MATLAB R2024b using MathWorks GitHub Actions. Synthetic fixtures check implementation behavior; full research experiments, historical accuracy and performance benchmarks have not been reproduced.

@@ -44,6 +44,10 @@ The seed is a starting point for recording runs; nested seed resets, parallel wo
 
 Candidate predictions are computed once and validated. Randomized selection samples only unselected candidates with a remaining retry budget, so exhausted candidates cannot be revisited indefinitely. The historical strict-accuracy acceptance rule is retained; its diversity-tie branch was unreachable, so `addedDiv` remains zero. All-tied above-worst selection retains valid models, and ANN labels use the training vocabulary. Standalone diversity helpers still have undefined degenerate cases. `Main.m` has incompatible legacy optimizer signatures; `clusteringPSO.m` depends on unprovided `fusionPSO`.
 
+## Runtime follow-up — October 2026
+
+GA uses the same >0.5 nonempty mask during scoring and return. Multi-objective GA measures pairwise double fault on selected models, returns one score-aligned ensemble, and exposes all Pareto masks/scores separately. BPSO personal-best storage is a vector. Feature PSO uses supported option names, nonempty masks and reproducible learner initialization. Prediction/training failures propagate instead of manufacturing votes. Original third-party author notices remain.
+
 ## Correctness review — October 2026
 
 This pass fixes implementation defects; it does not validate the associated research results. Changes can alter model pools, predictions and measured scores. Re-run the experiments before comparing corrected code with historical CSVs or published results.
@@ -55,6 +59,6 @@ This pass fixes implementation defects; it does not validate the associated rese
 
 See [the code review](docs/code-review.md) for repository-specific changes, tests and remaining limitations.
 
-**Validation:** all MATLAB sources were statically parsed/linted with MISS_HIT. MATLAB and its learner toolboxes are unavailable in the review environment. The MATLAB regression suites and full training runs have **not been executed** here. Run `runtests('tests')` and `assertSuccess(results)` in MATLAB before using the corrected experiments.
+**Validation:** 27 regression/smoke tests passed in MATLAB R2024b on Linux through [GitHub Actions](https://github.com/zohaibjan/ACM_TIST_CSME/actions/workflows/matlab-tests.yml). Tests include real toolbox execution on synthetic data. Full research datasets and published accuracy results have not been reproduced. See [validation evidence and limits](docs/validation.md).
 
 [Profile and project directory](https://github.com/zohaibjan)
