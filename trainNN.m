@@ -22,9 +22,10 @@ function network = trainNN(X, y, params , p)
     % Setup Division of Data for Training, Validation, Testing
     net.divideParam.trainRatio = 80/100;
     net.divideParam.valRatio = 20/100;
-%     net.divideParam.testRatio = 10/100;
+    net.divideParam.testRatio = 0;
 
     % Train the Network
     [net,tr] = train(net,x,t);
+    net.userdata.classLabels = unique(y(:));
     network = net;
 end

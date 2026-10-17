@@ -23,9 +23,9 @@ for fold=1:numOfFolds
     trainData = trainData(trainingSet, :);
     
     %% HOW MANY CLUSTERS UPPER BOUND - K
-    noOfClusters = round(nthroot(length(trainData), params.noOfClusters));
+    noOfClusters = round(nthroot(size(trainData, 1), params.noOfClusters));
     
-    allClusters = zeros(length(trainData),1);
+    allClusters = zeros(size(trainData, 1),1);
     totalClusters = 1;
     %% GENERATE ALL CLUSTERS - from k = 1, 2, ..., K
     for clusters=1:noOfClusters
