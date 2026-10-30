@@ -31,3 +31,6 @@ See [validation.md](validation.md) for the exact run, release and boundaries.
 - Optional historical optimizer/diversity/alternate-driver files are not a validated library.
 
 The regression/smoke suite passed in MATLAB R2024b using MathWorks GitHub Actions. Synthetic fixtures check implementation behavior; full research experiments, historical accuracy and performance benchmarks have not been reproduced.
+
+
+Feature-engineering update: frozen training-only PCA/NCA transforms now run after the inner split. Feature count is fixed in advance. Fold-statistic arrays are preallocated where previously grown; the ensemble selection policy is preserved. See README.md and testFeatureTransform.m.

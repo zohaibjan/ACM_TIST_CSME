@@ -5,7 +5,7 @@ numOfFolds = params.numOfFolds;
 data = load([pwd,filesep,'P-Data',filesep, p_name]);
 data = [data.X, data.y];                     %data = [normalize(data.X, 2) , data.y];
 cvFolds = cvpartition(data(:,end), 'KFold', numOfFolds);
-addedDiv = [];
+addedDiv = zeros(1,numOfFolds);
 
 %% ITERATE OVER THE NUMBER OF FOLDS
 for fold=1:numOfFolds
@@ -21,6 +21,12 @@ for fold=1:numOfFolds
     validationData = trainData(validationDataIndex,:);
     trainingSet =  ~validationDataIndex;
     trainData = trainData(trainingSet, :);
+
+    % Fit once on inner training rows, then freeze for validation and outer test.
+    featureState = fitFeatureTransform(trainData, params);
+    trainData = applyFeatureTransform(trainData, featureState);
+    validationData = applyFeatureTransform(validationData, featureState);
+    testData = applyFeatureTransform(testData, featureState);
     
     %% HOW MANY CLUSTERS UPPER BOUND - K
     noOfClusters = round(nthroot(size(trainData, 1), params.noOfClusters));

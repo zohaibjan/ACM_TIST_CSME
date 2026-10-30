@@ -62,3 +62,19 @@ See [the code review](docs/code-review.md) for repository-specific changes, test
 **Validation:** 27 regression/smoke tests passed in MATLAB R2024b on Linux through [GitHub Actions](https://github.com/zohaibjan/ACM_TIST_CSME/actions/workflows/matlab-tests.yml). Tests include real toolbox execution on synthetic data. Full research datasets and published accuracy results have not been reproduced. See [validation evidence and limits](docs/validation.md).
 
 [Profile and project directory](https://github.com/zohaibjan)
+
+## PCA and NCA feature engineering
+
+The current optional feature path is fitted **after the inner training/validation split**. Scaling, PCA coefficients or NCA weights are learned only from inner training rows and reused unchanged for validation and outer test rows. No test-loss threshold search is performed. This changes experimental results when enabled; re-run benchmarks before comparing with historical CSV files.
+
+```matlab
+params.featureMethod = 'nca';  % 'none' (default), 'pca', or 'nca'
+params.featureCount = 3;      % choose before evaluating; must fit training dimensions
+% Legacy params.NCA=true also enables NCA unless featureMethod is explicit.
+```
+
+MATLAB `fscnca` ranks original predictors by supervised feature weights and keeps a fixed top-k subset. PCA creates new components from variance structure. The feature count is a predeclared configuration, not automatically tuned; tune it within an additional training-only CV loop if required. Defaults: up to six PCA components or half the original features for NCA. Missing/nonfinite values are rejected by the transform helper; prepare missing-data handling before using it.
+
+The historical source had an NCA configuration flag. PCA and the safe fitted-transform helpers are additions in this update, not a claim that every published experiment used them. [Python PCA/NCA classification project](https://github.com/zohaibjan/feature-engineering-pca-nca) compares the approaches on a public dataset. Python NCA learns a full projection, whereas MATLAB fscnca selects original features; their numerical outputs are not equivalent.
+
+New tests in `tests/testFeatureTransform.m` exercise PCA, NCA, frozen training statistics, label preservation and dimensionality checks. These supplement the earlier validation results; check the latest Actions run for their runtime status.
